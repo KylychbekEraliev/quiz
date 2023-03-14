@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: secret
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: secret
+  name: kylych-secret
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-pod
+  namespace: secret
+spec:
+  containers:
+  - name: quiz
+    image: busybox:1.31.1
+    command: ["sleep","3600"]
+    env:
+    - name:  APP_USER
+      valueFrom:
+        secretKeyRef:
+          name: kylych-secret2
+          key: user
+    - name: APP_PASS
+      valueFrom:
+        secretKeyRef:
+          name: kylych-secret2
+          key: password
+    volumeMounts:
+    - name: secret-volume
+      mountPath: /tmp/secret1
+      readOnly: true
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: kylych-secret
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kylych-secret2
+  namespace: secret
+type: Opaque
+data:
+  user: a3lseWNoCg==
+  password: a3lseWNoYmVr 
+  
